@@ -68,19 +68,32 @@ def dashboard(request):
 @login_required
 def friends_list(request):
     """Show all friends with balances."""
+    from .services import get_balance_breakdown_between
     friends = get_friends(request.user)
     pending_requests = get_pending_friend_requests(request.user)
     sent_requests = Friendship.objects.filter(from_user=request.user, status='pending')
 
     friend_data = []
+    total_net_balance = Decimal('0.00')
+    
     for friend in friends:
         balance = get_balance_between(request.user, friend)
-        friend_data.append({'user': friend, 'balance': balance})
+        total_net_balance += balance
+        breakdown = []
+        if balance != Decimal('0.00'):
+            breakdown = get_balance_breakdown_between(request.user, friend)
+            
+        friend_data.append({
+            'user': friend, 
+            'balance': balance,
+            'breakdown': breakdown
+        })
 
     context = {
         'friend_data': friend_data,
         'pending_requests': pending_requests,
         'sent_requests': sent_requests,
+        'total_net_balance': total_net_balance,
     }
     return render(request, 'tracker/friends/list.html', context)
 

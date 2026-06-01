@@ -4,104 +4,127 @@
 {% block title %}Friends{% endblock %}
 
 {% block content %}
-<div class="page-header animate-slide-up">
-    <div>
-        <h1 style="display: flex; align-items: center; gap: 8px;"><i data-feather="users"></i> Friends List</h1>
-        <div class="page-subtitle">Track your shared balances and record payments with friends.</div>
+<div class="mobile-friends-layout">
+    <!-- Header with Search & Add Friend -->
+    <div style="display: flex; justify-content: flex-end; gap: 20px; padding: 16px 20px; padding-top: 24px;">
+        <a href="#" style="color: var(--text-primary);"><i data-feather="search" style="width: 24px; height: 24px;"></i></a>
+        <a href="{% url 'add_friend' %}" style="color: var(--text-primary);"><i data-feather="user-plus" style="width: 24px; height: 24px;"></i></a>
     </div>
-    <div>
-        <a href="{% url 'add_friend' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
-            <i data-feather="user-plus" style="width: 18px; height: 18px;"></i> Add Friend
-        </a>
-    </div>
-</div>
 
-<!-- Pending Requests Section -->
-{% if pending_requests %}
-<div class="card card-highlighted mb-4 animate-slide-up" style="max-width: 800px; margin: 0 auto 1.5rem;">
-    <div class="card-header">
-        <h3 style="color: var(--color-primary); display: flex; align-items: center; gap: 8px;"><i data-feather="bell"></i> Pending Friend Requests</h3>
-    </div>
-    <div class="card-body" style="display: flex; flex-direction: column; gap: var(--space-sm);">
-        {% for req in pending_requests %}
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); background: rgba(29, 209, 161, 0.05); border: 1px solid rgba(29, 209, 161, 0.15);">
-            <div style="display: flex; align-items: center; gap: var(--space-sm);">
-                <div class="avatar avatar-sm" style="background-color: {{ req.from_user|avatar_color }}; color: #0f1117; font-weight: 700;">
-                    {{ req.from_user|initials }}
-                </div>
-                <div>
-                    <span style="font-weight: 600; font-size: 0.92rem;">{{ req.from_user.get_full_name|default:req.from_user.username }}</span>
-
-                </div>
-            </div>
-            <div style="display: flex; gap: var(--space-xs);">
-                <a href="{% url 'accept_friend' req.id %}" class="btn btn-primary btn-sm">Accept</a>
-                <a href="{% url 'reject_friend' req.id %}" class="btn btn-outline btn-sm" style="color: var(--color-negative); border-color: rgba(255, 107, 107, 0.2);">Decline</a>
-            </div>
+    <!-- Overall Balance -->
+    <div style="padding: 0 20px 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <h1 style="font-size: 1.35rem; font-weight: 600; margin: 0; color: var(--text-primary);">
+                Overall, 
+                {% if total_net_balance > 0 %}
+                you are owed <span class="text-positive" style="color: #1dd1a1;">{{ total_net_balance|currency }}</span>
+                {% elif total_net_balance < 0 %}
+                you owe <span class="text-warning" style="color: #ff9f43;">{{ total_net_balance|abs_value|currency }}</span>
+                {% else %}
+                you are settled up
+                {% endif %}
+            </h1>
+            <a href="#" style="color: #ff7f50;"><i data-feather="sliders" style="width: 24px; height: 24px;"></i></a>
         </div>
-        {% endfor %}
+        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 24px; font-weight: 500;">
+            Showing friends with outstanding balances
+        </div>
     </div>
-</div>
-{% endif %}
 
-<!-- Friends Grid / List -->
-<div class="card card-glass animate-slide-up" style="max-width: 800px; margin: 0 auto;">
-    <div class="card-header">
-        <h2>Accepted Friends</h2>
-        <span class="text-muted" style="font-size: 0.85rem;">{{ friend_data|length }} friends</span>
-    </div>
-    <div class="card-body" style="padding: 0;">
-        {% if friend_data %}
-            <div style="display: flex; flex-direction: column;">
-                {% for fd in friend_data %}
-                <a href="{% url 'friend_detail' fd.user.id %}" class="list-item" style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; transition: all var(--transition-fast);">
-                    <div style="display: flex; align-items: center; gap: var(--space-md);">
-                        <div class="avatar avatar-md" style="background-color: {{ fd.user|avatar_color }}; color: #0f1117; font-weight: 700;">
-                            {{ fd.user|initials }}
-                        </div>
-                        <div>
-                            <div style="font-weight: 600; font-size: 0.95rem;">{{ fd.user.get_full_name|default:fd.user.username }}</div>
-
-                        </div>
+    <!-- Pending Requests Section -->
+    {% if pending_requests %}
+    <div style="padding: 0 20px; margin-bottom: 20px;">
+        <h3 style="color: var(--color-primary); font-size: 1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i data-feather="bell" style="width: 16px; height: 16px;"></i> Pending Friend Requests
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+            {% for req in pending_requests %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 8px; background: rgba(29, 209, 161, 0.05); border: 1px solid rgba(29, 209, 161, 0.15);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="avatar avatar-sm" style="background-color: {{ req.from_user|avatar_color }}; color: #0f1117; font-weight: 700;">
+                        {{ req.from_user|initials }}
                     </div>
-                    
-                    <div style="text-align: right; display: flex; align-items: center; gap: var(--space-md);">
-                        <div>
+                    <div>
+                        <span style="font-weight: 600; font-size: 0.92rem;">{{ req.from_user.get_full_name|default:req.from_user.username }}</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="{% url 'accept_friend' req.id %}" class="btn btn-primary btn-sm">Accept</a>
+                    <a href="{% url 'reject_friend' req.id %}" class="btn btn-outline btn-sm" style="color: var(--color-negative); border-color: rgba(255, 107, 107, 0.2);">Decline</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Flat Friends List -->
+    <div style="display: flex; flex-direction: column; padding-bottom: 40px;">
+        {% if friend_data %}
+            {% for fd in friend_data %}
+            <a href="{% url 'friend_detail' fd.user.id %}" style="display: flex; gap: 16px; padding: 16px 20px; text-decoration: none; color: inherit; position: relative;">
+                
+                <!-- Avatar -->
+                <div class="avatar" style="background-color: {{ fd.user|avatar_color }}; color: #0f1117; font-weight: 700; flex-shrink: 0; width: 56px; height: 56px; font-size: 1.4rem; border-radius: 50%;">
+                    {{ fd.user|initials }}
+                </div>
+
+                <!-- Content -->
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start;">
+                    <!-- Name and Balance -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; min-height: 56px;">
+                        <div style="font-size: 1.1rem; font-weight: 500; color: var(--text-primary); margin-top: 8px;">
+                            {{ fd.user.get_full_name|default:fd.user.username }}
+                        </div>
+                        <div style="text-align: right; margin-top: 4px;">
                             {% if fd.balance > 0 %}
-                            <div class="text-positive" style="font-weight: 600; font-size: 0.95rem;">
-                                {{ fd.balance|currency }}
-                            </div>
-                            <div class="text-muted" style="font-size: 0.7rem;">owes you</div>
+                            <div style="font-size: 0.75rem; color: #1dd1a1; margin-bottom: 2px;">owes you</div>
+                            <div style="color: #1dd1a1; font-size: 1.05rem; font-weight: 500;">{{ fd.balance|currency }}</div>
                             {% elif fd.balance < 0 %}
-                            <div class="text-negative" style="font-weight: 600; font-size: 0.95rem;">
-                                {{ fd.balance|abs_value|currency }}
-                            </div>
-                            <div class="text-muted" style="font-size: 0.7rem;">you owe</div>
+                            <div style="font-size: 0.75rem; color: #ff9f43; margin-bottom: 2px;">you owe</div>
+                            <div style="color: #ff9f43; font-size: 1.05rem; font-weight: 500;">{{ fd.balance|abs_value|currency }}</div>
                             {% else %}
-                            <div class="text-muted" style="font-weight: 500; font-size: 0.88rem;">
-                                Settled Up
-                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 2px;">settled up</div>
                             {% endif %}
                         </div>
-                        <span style="font-size: 0.85rem; color: var(--text-disabled);"><i data-feather="chevron-right" style="width: 16px; height: 16px;"></i></span>
                     </div>
-                </a>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state" style="text-align: center; padding: var(--space-2xl) var(--space-xl); color: var(--text-secondary);">
-                <div style="margin-bottom: var(--space-md); display: flex; justify-content: center;">
-                    <i data-feather="users" style="width: 48px; height: 48px; color: var(--text-disabled);"></i>
+
+                    <!-- Breakdown Tree -->
+                    {% if fd.breakdown and fd.breakdown|length > 0 %}
+                    <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 8px;">
+                        {% for bd in fd.breakdown %}
+                        <div style="display: flex; font-size: 0.85rem; color: var(--text-secondary); align-items: center;">
+                            <div style="width: 24px; border-left: 2px solid rgba(255,255,255,0.15); border-bottom: 2px solid rgba(255,255,255,0.15); height: 16px; margin-right: 12px; margin-top: -16px; margin-left: 4px;"></div>
+                            <div style="flex: 1; line-height: 1.4;">
+                                {{ fd.user.get_full_name|default:fd.user.username|truncatechars:12 }} 
+                                {% if bd.balance > 0 %}
+                                owes you <span style="color: #1dd1a1; font-weight: 500;">{{ bd.balance|currency }}</span>
+                                {% else %}
+                                you owe <span style="color: #ff9f43; font-weight: 500;">{{ bd.balance|abs_value|currency }}</span>
+                                {% endif %}
+                                for "{{ bd.name|truncatechars:20 }}"
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-                <h3>Your friends list is empty</h3>
-                <p style="font-size: 0.9rem; margin-top: 4px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                    SplitWise is way better with friends! Search for friends using their email address and send a request.
-                </p>
-                <a href="{% url 'add_friend' %}" class="btn btn-primary" style="margin-top: var(--space-md); display: inline-flex; align-items: center; gap: 6px;">
-                    <i data-feather="user-plus" style="width: 16px; height: 16px;"></i> Add your first friend
-                </a>
+            </a>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                <i data-feather="users" style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 16px;"></i>
+                <h3>No friends yet</h3>
+                <p style="font-size: 0.9rem; margin-top: 8px;">Search for friends and start splitting expenses.</p>
             </div>
         {% endif %}
+
+        <!-- Add more friends button -->
+        <div style="padding: 16px; margin-top: 8px; display: flex; justify-content: center;">
+            <a href="{% url 'add_friend' %}" style="border: 1px solid rgba(255,255,255,0.2); color: var(--text-primary); border-radius: 6px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; width: 220px; justify-content: center; padding: 12px; text-decoration: none;">
+                <i data-feather="user-plus" style="width: 18px; height: 18px;"></i> Add more friends
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
