@@ -137,31 +137,6 @@
             <div class="page-content animate-fade-in">
                 {% block content %}{% endblock %}
             </div>
-            
-            <!-- Mobile Bottom Nav -->
-            <nav class="bottom-nav mobile-only">
-                <a href="{% url 'dashboard' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'group_detail' %}active{% endif %}">
-                    <i data-feather="users"></i>
-                    <span>Groups</span>
-                </a>
-                <a href="{% url 'friends_list' %}" class="bottom-nav-item {% if 'friend' in request.resolver_match.url_name %}active{% endif %}">
-                    <i data-feather="user"></i>
-                    <span>Friends</span>
-                </a>
-                <a href="{% url 'activity_feed' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'activity_feed' %}active{% endif %}">
-                    <i data-feather="activity"></i>
-                    <span>Activity</span>
-                </a>
-                <a href="{% url 'profile' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                    <i data-feather="settings"></i>
-                    <span>Account</span>
-                </a>
-            </nav>
-            
-            <!-- Mobile FAB -->
-            <a href="{% url 'add_expense' %}" class="fab mobile-only">
-                <i data-feather="file-text"></i> Add expense
-            </a>
         </main>
     </div>
     

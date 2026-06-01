@@ -200,39 +200,6 @@ def get_balance_between(user_a, user_b, group=None):
     return balance.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 
-def get_balance_breakdown_between(user_a, user_b):
-    """
-    Returns a breakdown of the net balance between user_a and user_b, separated by group.
-    Returns a list of dicts: [{'name': 'Non-group', 'balance': Decimal}, {'name': 'Group Name', 'balance': Decimal}]
-    Only includes groups (or non-group) where the balance is non-zero.
-    """
-    breakdown = []
-    
-    # Calculate Non-group balance
-    non_group_balance = get_balance_between(user_a, user_b, group=None)
-    if non_group_balance != Decimal('0.00'):
-        breakdown.append({
-            'name': 'Non-group expenses',
-            'balance': non_group_balance
-        })
-        
-    # Get all groups that both users are a part of, or where they share expenses
-    from .models import Group
-    
-    # Simple way: get all groups
-    all_groups = Group.objects.filter(memberships__user=user_a).filter(memberships__user=user_b)
-    
-    for group in all_groups:
-        group_balance = get_balance_between(user_a, user_b, group=group)
-        if group_balance != Decimal('0.00'):
-            breakdown.append({
-                'name': group.name,
-                'balance': group_balance
-            })
-            
-    return breakdown
-
-
 def get_user_total_balance(user):
     """
     Aggregate balance summary for *user* across **all** other users.
