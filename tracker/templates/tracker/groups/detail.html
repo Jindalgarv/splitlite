@@ -21,8 +21,8 @@
         <a href="{% url 'add_expense' %}?group={{ group.id }}" class="btn btn-primary">
             ➕ Add Expense
         </a>
-        <a href="{% url 'settle_up' %}?group={{ group.id }}" class="btn btn-secondary">
-            🤝 Settle Up
+        <a href="{% url 'settle_up' %}?group={{ group.id }}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
+            <i data-feather="check-square" style="width: 16px; height: 16px;"></i> Record Payment
         </a>
         <a href="{% url 'group_balances' group.id %}" class="btn btn-outline-primary">
             ⚖️ View Balances

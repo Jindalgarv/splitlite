@@ -846,35 +846,48 @@ def settle_up(request):
         group = get_object_or_404(Group, id=group_id)
 
     if request.method == 'POST':
-        to_user_id = request.POST.get('to_user')
+        friend_id = request.POST.get('friend_id')
+        payer_choice = request.POST.get('payer')
         amount = Decimal(request.POST.get('amount', '0'))
         date_val = request.POST.get('date')
         notes = request.POST.get('notes', '')
         post_group_id = request.POST.get('group', '')
 
-        to_user = get_object_or_404(User, id=to_user_id)
+        friend_user = get_object_or_404(User, id=friend_id)
+        
+        if payer_choice == 'me':
+            from_user = request.user
+            to_user = friend_user
+        else:
+            from_user = friend_user
+            to_user = request.user
+
         settle_group = None
         if post_group_id:
             settle_group = Group.objects.filter(id=post_group_id).first()
 
         settlement = Settlement.objects.create(
-            from_user=request.user,
+            from_user=from_user,
             to_user=to_user,
             amount=amount,
             date=date_val,
             group=settle_group,
             notes=notes,
         )
-        log_activity(request.user, 'settlement',
-                     f"{request.user.get_full_name() or request.user.username} paid ₹{amount} to {to_user.get_full_name() or to_user.username}",
-                     group=settle_group, settlement=settlement)
-        create_notification(
-            to_user,
-            f"{request.user.get_full_name() or request.user.username} paid you ₹{amount}",
-            notification_type='settlement',
-            link='/settle/history/'
-        )
-        messages.success(request, f'Payment of ₹{amount} to {to_user.get_full_name() or to_user.username} recorded!')
+        
+        # Determine names for activity/notification
+        from_name = from_user.get_full_name() or from_user.username
+        to_name = to_user.get_full_name() or to_user.username
+        
+        if from_user == request.user:
+            log_activity(request.user, 'settlement', f"You paid ₹{amount} to {to_name}", group=settle_group, settlement=settlement)
+            create_notification(to_user, f"{from_name} paid you ₹{amount}", notification_type='settlement', link='/settle/history/')
+            messages.success(request, f'Payment of ₹{amount} to {to_name} recorded!')
+        else:
+            log_activity(request.user, 'settlement', f"{from_name} paid you ₹{amount}", group=settle_group, settlement=settlement)
+            create_notification(from_user, f"You recorded a payment of ₹{amount} from {from_name} to you.", notification_type='settlement', link='/settle/history/')
+            messages.success(request, f'Payment of ₹{amount} from {from_name} recorded!')
+
         if settle_group:
             return redirect('group_detail', group_id=settle_group.id)
         return redirect('dashboard')

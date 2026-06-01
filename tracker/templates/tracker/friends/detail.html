@@ -16,7 +16,7 @@
     </div>
     <div class="flex gap-sm">
         <a href="{% url 'settle_up' %}?to={{ friend.id }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
-            <i data-feather="check-square" style="width: 16px; height: 16px;"></i> Settle Up
+            <i data-feather="check-square" style="width: 16px; height: 16px;"></i> Record Payment
         </a>
         <a href="{% url 'friends_list' %}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
             <i data-feather="arrow-left" style="width: 16px; height: 16px;"></i> All Friends
@@ -94,7 +94,7 @@
     <!-- Settlements Log -->
     <div class="card card-glass">
         <div class="card-header">
-            <h2 style="display: flex; align-items: center; gap: 8px;"><i data-feather="check-square"></i> Settlement History</h2>
+            <h2 style="display: flex; align-items: center; gap: 8px;"><i data-feather="check-square"></i> Payment History</h2>
         </div>
         <div class="card-body" style="padding: 0;">
             {% if settlements %}

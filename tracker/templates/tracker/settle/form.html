@@ -1,16 +1,16 @@
 {% extends 'tracker/base.html' %}
 {% load splitwise_tags %}
 
-{% block title %}Settle Up{% endblock %}
+{% block title %}Record Payment{% endblock %}
 
 {% block content %}
 <div class="page-header animate-slide-up">
     <div>
-        <h1>🤝 Settle Up</h1>
-        <div class="page-subtitle">Record a payment made directly to a friend to clear your balances.</div>
+        <h1 style="display: flex; align-items: center; gap: 8px;"><i data-feather="check-square"></i> Record Payment</h1>
+        <div class="page-subtitle">Record a payment made to or received from a friend to clear your balances.</div>
     </div>
     <div>
-        <a href="{% url 'dashboard' %}" class="btn btn-outline">⬅️ Cancel</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;"><i data-feather="arrow-left" style="width: 16px; height: 16px;"></i> Cancel</a>
     </div>
 </div>
 
@@ -20,10 +20,10 @@
             <form method="POST" style="display: flex; flex-direction: column; gap: var(--space-md);">
                 {% csrf_token %}
 
-                <!-- Recipient selector -->
+                <!-- Friend selector -->
                 <div class="form-group" style="display: flex; flex-direction: column; gap: var(--space-xs);">
-                    <label for="to_user" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Friend to Pay</label>
-                    <select name="to_user" id="to_user" class="form-select" required style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.6rem; border-radius: var(--radius-md);">
+                    <label for="friend_id" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Friend</label>
+                    <select name="friend_id" id="friend_id" class="form-select" required style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.6rem; border-radius: var(--radius-md);">
                         <option value="">-- Select Friend --</option>
                         {% for friend_opt in friend_options %}
                         <option value="{{ friend_opt.user.id }}" {% if preselected_to == friend_opt.user.id %}selected{% endif %}>
@@ -34,6 +34,15 @@
                     </select>
                 </div>
 
+                <!-- Who paid selector -->
+                <div class="form-group" style="display: flex; flex-direction: column; gap: var(--space-xs);">
+                    <label for="payer" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Who Paid?</label>
+                    <select name="payer" id="payer" class="form-select" required style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.6rem; border-radius: var(--radius-md);">
+                        <option value="me">I paid them</option>
+                        <option value="friend">They paid me</option>
+                    </select>
+                </div>
+
                 <!-- Group selector (Optional) -->
                 <div class="form-group" style="display: flex; flex-direction: column; gap: var(--space-xs);">
                     <label for="group" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Group Scope (Optional)</label>
@@ -41,7 +50,7 @@
                         <option value="">General Balance (Non-group)</option>
                         {% for gp in groups %}
                         <option value="{{ gp.id }}" {% if group.id == gp.id %}selected{% endif %}>
-                            {{ gp.get_type_display_icon }} {{ gp.name }}
+                            {{ gp.name }}
                         </option>
                         {% endfor %}
                     </select>
@@ -49,7 +58,7 @@
 
                 <!-- Amount -->
                 <div class="form-group" style="display: flex; flex-direction: column; gap: var(--space-xs);">
-                    <label for="amount" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Amount Settled (₹)</label>
+                    <label for="amount" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Amount (₹)</label>
                     <input type="number" step="0.01" min="0.01" name="amount" id="amount" placeholder="0.00" class="form-input" required style="width: 100%;">
                 </div>
 
@@ -67,8 +76,8 @@
 
                 <div style="display: flex; justify-content: flex-end; gap: var(--space-sm); margin-top: var(--space-sm);">
                     <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
-                    <button type="submit" class="btn btn-primary">
-                        🤝 Record Payment
+                    <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-feather="check-square" style="width: 16px; height: 16px;"></i> Record Payment
                     </button>
                 </div>
             </form>
