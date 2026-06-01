@@ -79,10 +79,7 @@
                     <span class="nav-icon"><i data-feather="bar-chart-2"></i></span> Reports
                 </a>
 
-                <div class="sidebar-divider"></div>
-                <a href="{% url 'settle_up' %}" class="nav-link {% if request.resolver_match.url_name == 'settle_up' %}active{% endif %}" style="background: rgba(29, 209, 161, 0.1); border-left-color: var(--color-primary); color: var(--color-primary);">
-                    <span class="nav-icon"><i data-feather="check-square"></i></span> Settle Up
-                </a>
+
             </nav>
 
             {% if user.is_authenticated %}
