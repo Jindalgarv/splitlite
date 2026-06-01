@@ -148,7 +148,7 @@
                     <i data-feather="user"></i>
                     <span>Friends</span>
                 </a>
-                <a href="{% url 'recent_activity' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'recent_activity' %}active{% endif %}">
+                <a href="{% url 'activity_feed' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'activity_feed' %}active{% endif %}">
                     <i data-feather="activity"></i>
                     <span>Activity</span>
                 </a>
