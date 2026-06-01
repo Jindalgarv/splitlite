@@ -31,7 +31,7 @@
                 </div>
                 <div>
                     <span style="font-weight: 600; font-size: 0.92rem;">{{ req.from_user.get_full_name|default:req.from_user.username }}</span>
-                    <span class="text-muted" style="font-size: 0.75rem; display: block;">@{{ req.from_user.username }}</span>
+
                 </div>
             </div>
             <div style="display: flex; gap: var(--space-xs);">
@@ -61,7 +61,7 @@
                         </div>
                         <div>
                             <div style="font-weight: 600; font-size: 0.95rem;">{{ fd.user.get_full_name|default:fd.user.username }}</div>
-                            <div class="text-muted" style="font-size: 0.75rem;">@{{ fd.user.username }}</div>
+
                         </div>
                     </div>
                     
@@ -83,20 +83,22 @@
                             </div>
                             {% endif %}
                         </div>
-                        <span style="font-size: 0.85rem; color: var(--text-disabled);">➡️</span>
+                        <span style="font-size: 0.85rem; color: var(--text-disabled);"><i data-feather="chevron-right" style="width: 16px; height: 16px;"></i></span>
                     </div>
                 </a>
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-state" style="text-align: center; padding: var(--space-2xl) var(--space-xl); color: var(--text-secondary);">
-                <div style="font-size: 3rem; margin-bottom: var(--space-md);">👥</div>
+                <div style="margin-bottom: var(--space-md); display: flex; justify-content: center;">
+                    <i data-feather="users" style="width: 48px; height: 48px; color: var(--text-disabled);"></i>
+                </div>
                 <h3>Your friends list is empty</h3>
                 <p style="font-size: 0.9rem; margin-top: 4px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                    SplitWise is way better with friends! Search for friends using their username or email address and send a request.
+                    SplitWise is way better with friends! Search for friends using their email address and send a request.
                 </p>
-                <a href="{% url 'add_friend' %}" class="btn btn-primary" style="margin-top: var(--space-md);">
-                    ➕ Add your first friend
+                <a href="{% url 'add_friend' %}" class="btn btn-primary" style="margin-top: var(--space-md); display: inline-flex; align-items: center; gap: 6px;">
+                    <i data-feather="user-plus" style="width: 16px; height: 16px;"></i> Add your first friend
                 </a>
             </div>
         {% endif %}
