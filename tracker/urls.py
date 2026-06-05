@@ -37,6 +37,7 @@ urlpatterns = [
     # Settlements
     path('settle/', views.settle_up, name='settle_up'),
     path('settle/history/', views.settlement_history, name='settlement_history'),
+    path('settle/auto/<int:friend_id>/', views.auto_settle, name='auto_settle'),
 
     # Activity
     path('activity/', views.activity_feed, name='activity_feed'),

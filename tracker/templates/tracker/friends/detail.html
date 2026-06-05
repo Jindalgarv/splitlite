@@ -18,6 +18,14 @@
         <a href="{% url 'settle_up' %}?to={{ friend.id }}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
             <i data-feather="check-square" style="width: 16px; height: 16px;"></i> Record Payment
         </a>
+        {% if balance != 0 %}
+        <form method="post" action="{% url 'auto_settle' friend.id %}" style="margin: 0; display: inline-block;" onsubmit="return confirm('Are you sure you want to completely settle up your balance with {{ friend.get_full_name|default:friend.username }}? This will record a payment automatically.');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                <i data-feather="check-circle" style="width: 16px; height: 16px;"></i> Settle Up
+            </button>
+        </form>
+        {% endif %}
         <a href="{% url 'friends_list' %}" class="btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
             <i data-feather="arrow-left" style="width: 16px; height: 16px;"></i> All Friends
         </a>

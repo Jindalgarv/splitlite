@@ -908,6 +908,50 @@ def settle_up(request):
     }
     return render(request, 'tracker/settle/form.html', context)
 
+@login_required
+def auto_settle(request, friend_id):
+    """Automatically record a payment to settle the entire net balance between the user and friend."""
+    if request.method == 'POST':
+        friend = get_object_or_404(User, id=friend_id)
+        balance = get_balance_between(request.user, friend)
+        
+        if balance == Decimal('0.00'):
+            messages.info(request, "You are already settled up.")
+            return redirect('friend_detail', user_id=friend_id)
+            
+        if balance > 0:
+            # friend owes user
+            from_user = friend
+            to_user = request.user
+            amount = balance
+        else:
+            # user owes friend
+            from_user = request.user
+            to_user = friend
+            amount = abs(balance)
+            
+        settlement = Settlement.objects.create(
+            from_user=from_user,
+            to_user=to_user,
+            amount=amount,
+            date=now().strftime('%Y-%m-%d'),
+            notes="Auto-settled via quick action",
+        )
+        
+        from_name = from_user.get_full_name() or from_user.username
+        to_name = to_user.get_full_name() or to_user.username
+        
+        if from_user == request.user:
+            log_activity(request.user, 'settlement', f"You paid ₹{amount} to {to_name}", settlement=settlement)
+            create_notification(to_user, f"{from_name} paid you ₹{amount} to settle up.", notification_type='settlement', link='/settle/history/')
+            messages.success(request, f'Successfully settled up! You paid ₹{amount} to {to_name}.')
+        else:
+            log_activity(request.user, 'settlement', f"{from_name} paid you ₹{amount}", settlement=settlement)
+            create_notification(from_user, f"You recorded a payment of ₹{amount} from {from_name} to you to settle up.", notification_type='settlement', link='/settle/history/')
+            messages.success(request, f'Successfully settled up! {from_name} paid you ₹{amount}.')
+            
+    return redirect('friend_detail', user_id=friend_id)
+
 
 @login_required
 def settlement_history(request):
