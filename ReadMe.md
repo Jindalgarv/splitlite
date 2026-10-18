@@ -45,7 +45,11 @@ DEBUG=True
 SECRET_KEY="your-local-django-secret-key"
 GOOGLE_CLIENT_ID="your-google-oauth-client-id.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET="your-google-oauth-client-secret"
+VAPID_PUBLIC_KEY="your-vapid-public-key"
+VAPID_PRIVATE_KEY="your-vapid-private-key"
 ```
+
+Push notifications need a VAPID key pair. Generate one with `python generate_vapid_keys.py` and paste the two lines it prints into `.env` (and into your Railway variables in production). Push stays off while they're unset.
 
 ### 3️⃣ Create Virtual Environment & Install Dependencies
 ```bash

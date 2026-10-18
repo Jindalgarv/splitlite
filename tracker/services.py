@@ -390,7 +390,7 @@ def create_notification(user, message, notification_type='expense', link=''):
     
     # Send Web Push Notification
     subscriptions = PushSubscription.objects.filter(user=user)
-    if subscriptions.exists():
+    if settings.VAPID_PRIVATE_KEY and subscriptions.exists():
         payload = json.dumps({
             'title': 'SplitLite',
             'body': message,

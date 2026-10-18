@@ -588,6 +588,8 @@ document.addEventListener('DOMContentLoaded', function () {
     } else if (href && href !== '/' && currentPath.startsWith(href)) {
       link.classList.add('active');
     }
+  });
+
   // ─── Web Push Notifications ──────────────────────────────
   function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -600,6 +602,12 @@ document.addEventListener('DOMContentLoaded', function () {
       outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
+  }
+
+  function isSameKey(buffer, key) {
+    if (!buffer) return false;
+    const bytes = new Uint8Array(buffer);
+    return bytes.length === key.length && bytes.every((byte, i) => byte === key[i]);
   }
 
   function getCookie(name) {
@@ -626,13 +634,24 @@ document.addEventListener('DOMContentLoaded', function () {
           fetch('/api/push/vapid-public-key/')
             .then(response => response.json())
             .then(data => {
+              if (!data.public_key) return null;
               const convertedVapidKey = urlBase64ToUint8Array(data.public_key);
-              return registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: convertedVapidKey
-              });
+              // A subscription made with an older key must be dropped, or subscribe() rejects
+              return registration.pushManager.getSubscription()
+                .then(function(existing) {
+                  if (existing && !isSameKey(existing.options.applicationServerKey, convertedVapidKey)) {
+                    return existing.unsubscribe();
+                  }
+                })
+                .then(function() {
+                  return registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: convertedVapidKey
+                  });
+                });
             })
             .then(function(subscription) {
+              if (!subscription) return null;
               return fetch('/api/push/subscribe/', {
                 method: 'POST',
                 headers: {
@@ -643,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function () {
               });
             })
             .then(function(response) {
-              if (response.ok) console.log('Successfully subscribed to push notifications.');
+              if (response && response.ok) console.log('Successfully subscribed to push notifications.');
             })
             .catch(function(err) {
               console.error('Failed to subscribe the user: ', err);

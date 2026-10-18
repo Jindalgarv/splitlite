@@ -26,3 +26,6 @@ Thumbs.db
 # Collected static files
 staticfiles/
 
+
+# Keys and certificates (VAPID keys belong in .env)
+*.pem

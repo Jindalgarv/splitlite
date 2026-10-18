@@ -1301,7 +1301,4 @@ def subscribe_push(request):
 @login_required
 def get_vapid_public_key(request):
     from django.conf import settings
-    # Read the PEM file and convert to base64 for frontend, OR if we had it as string we'd just send it.
-    # We already extracted it manually:
-    public_key = "BH0BAnhPYXGfYR7yTg0_XEYKjjtJPTzdH16oS4r2-Kg8hzzmkdug2yo1U2C1yWrQqyHeQ0BfKNkWjSubHj6WXTw"
-    return JsonResponse({'public_key': public_key})
+    return JsonResponse({'public_key': settings.VAPID_PUBLIC_KEY})
